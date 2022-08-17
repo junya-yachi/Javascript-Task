@@ -1,57 +1,59 @@
 'use strict'
+{
+   $(document).ready(function() {
+      let startTime;
+      let timeoutId;
+      let elapsedTime = 0;
 
-let $result = $(".result").innerHTML;
-$result = '';
+      function countUp() {
+        const d = new Date(Date.now() - startTime + elapsedTime);
+        const h = d.getUTCHours();
+        const m = d.getMinutes();
+        const s = d.getSeconds();
+        const ms = d.getMilliseconds();
+        $(".timer").text(`${h}:${m}:${s}:${ms}`);
+        
+        timeoutId = setTimeout(() => {
+          countUp();
+        }, 10);
+      }
 
-function displayResult() {
-  $(".result").text(`${$result}`);
-}
+      function buttonDefault() {
+        $(".start").prop("disabled", false);
+        $(".stop").prop("disabled", true);
+        $(".reset").prop("disabled", true);
+      }
 
-function clickButton(button) {
-  let number = button.innerHTML;
-  if($result === '0' || $result === '00') {
-    $result = number;
-    displayResult();
-  } else {
-    $result += number;
-    displayResult();
-    console.log($result);
-  }
-}
+      function clickButtonStart() {
+        $(".start").prop("disabled", true);
+        $(".stop").prop("disabled", false);
+        $(".reset").prop("disabled", true);
+      }
 
-function clickOperator(button) {
-  let number = button.innerHTML;
-  if ($result.slice(-1) === '+' || $result.slice(-1) === '-' || $result.slice(-1) === '*' || $result.slice(-1) === '/' || $result.slice(-1) === '') {
-    return;
-  }  else {
-    $result += number;
-    displayResult();
-    console.log($result);
-  } 
-}
+      function clickButtonStop() {
+        $(".start").prop("disabled", false);
+        $(".stop").prop("disabled", true);
+        $(".reset").prop("disabled", false);
+      }
 
-function clickClear() {
-  $result = '0';
-  displayResult();
-  console.log($result);
-}
+      buttonDefault();
 
-function clickEqual() {
-  $result = eval($result);
-  displayResult();
-  console.log($result);
-}
-
-function clickPoint(button) {
-  let number = button.innerHTML;
-  if ($result.slice(-1) === '.') {
-    return;
-  } else if ($result === '0' || $result === '00' || $result === ''){
-    $result = '0';
-    $result += number;
-    displayResult();
-  } else {
-    $result += number;
-    displayResult();
-  }
+      $(".start").click(function() {
+        startTime = Date.now();
+        countUp();
+        clickButtonStart();
+      }); 
+      
+      $(".stop").click(function() {
+        clearTimeout(timeoutId);
+        elapsedTime += Date.now() - startTime;
+        clickButtonStop();
+      }); 
+      
+      $(".reset").click(function() {
+        $(".timer").text("0:0:0:0");
+        elapsedTime = 0;
+        buttonDefault();
+      }); 
+  });
 }
